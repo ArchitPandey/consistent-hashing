@@ -135,6 +135,11 @@ public class Murmur3ConsistentHasher implements IConsistentHasher {
         return nodeToTokenRangesMap;
     }
 
+    @Override
+    public int getHashForKey(String key) {
+        return this.murmur3Hash(key);
+    }
+
     private String vNodeString(String nodeAddress, int suffix) {
         return nodeAddress.concat(Integer.toString(suffix));
     }

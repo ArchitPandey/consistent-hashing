@@ -2,14 +2,14 @@ package org.example.consistenthash;
 
 public class TokenRange {
 
+    private int startToken;
+
+    private int endToken;
+
     public TokenRange(int start, int end) {
         this.startToken = start;
         this.endToken = end;
     }
-
-    int startToken;
-
-    int endToken;
 
     public int getStartToken() {
         return this.startToken;

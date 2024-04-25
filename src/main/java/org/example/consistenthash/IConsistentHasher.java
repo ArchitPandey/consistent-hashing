@@ -15,4 +15,5 @@ public interface IConsistentHasher {
 
     Map<String, List<TokenRange>> getTokenRangeForAllNodes();
 
+    int getHashForKey(String key);
 }
