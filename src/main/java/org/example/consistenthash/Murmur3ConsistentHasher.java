@@ -15,7 +15,8 @@ public class Murmur3ConsistentHasher implements IConsistentHasher {
                                    List<String> nodeAddresses) {
         this.numVNodesPerPhysicalNode = numVNodesPerPhysicalNode;
         this.nodeAddresses = new HashSet<>();
-        init();
+        this.tokenToNodeMap = new TreeMap<Integer, String>();
+        init(nodeAddresses);
     }
 
     /**
@@ -52,7 +53,7 @@ public class Murmur3ConsistentHasher implements IConsistentHasher {
      * https://tom-e-white.com/2007/11/consistent-hashing.html
      * https://github.com/zeromicro/go-zero/blob/master/core/hash/consistenthash.go
      *
-     * Another approach is can be use an array of hash functions and
+     * Another approach uses an array of hash functions and
      * calculate hash of node address using each hash function. the
      * hash function outputs are vnodes on the consistent hash ring
      *
@@ -101,9 +102,9 @@ public class Murmur3ConsistentHasher implements IConsistentHasher {
     public List<TokenRange> getTokenRangeForNode(String nodeAddress) {
         List<TokenRange> tokenRanges = new ArrayList<>();
 
-        for(int i=1; i<this.numVNodesPerPhysicalNode; i++) {
+        for(int i=1; i<=this.numVNodesPerPhysicalNode; i++) {
             int vNodePosition = murmur3Hash(vNodeString(nodeAddress, i));
-            Integer previousVNode = this.tokenToNodeMap.floorKey(vNodePosition);
+            Integer previousVNode = this.tokenToNodeMap.lowerKey(vNodePosition);
 
             //if we don't find a vNode before vNodePosition
             //this means vNodePosition is the first vNode in
@@ -113,7 +114,7 @@ public class Murmur3ConsistentHasher implements IConsistentHasher {
             if ( Objects.isNull(previousVNode) ) {
                 Integer lastVNode = this.tokenToNodeMap.lastKey();
                 tokenRanges.add(new TokenRange(lastVNode+1, Integer.MAX_VALUE));
-                tokenRanges.add(new TokenRange(0, vNodePosition));
+                tokenRanges.add(new TokenRange(Integer.MIN_VALUE, vNodePosition));
             } else {
                 tokenRanges.add(new TokenRange(previousVNode+1, vNodePosition));
             }
@@ -143,7 +144,7 @@ public class Murmur3ConsistentHasher implements IConsistentHasher {
         return hash;
     }
 
-    private void init() {
+    private void init(List<String> nodeAddresses) {
         for(String nodeAddress: nodeAddresses) {
             addNode(nodeAddress);
         }

@@ -18,4 +18,8 @@ public class TokenRange {
     public int getEndToken() {
         return this.endToken;
     }
+
+    public String toString() {
+        return "StartToken:".concat(Integer.toString(startToken)).concat(" - EndToken:").concat(Integer.toString(endToken));
+    }
 }
